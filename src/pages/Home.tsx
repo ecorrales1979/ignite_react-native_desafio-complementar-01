@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { View, StyleSheet } from 'react-native';
 
 import { Header } from '../components/Header';
 import { MyTasksList } from '../components/MyTasksList';
 import { TodoInput } from '../components/TodoInput';
+import { useTheme } from '../styles';
 
 interface Task {
   id: number;
@@ -11,31 +13,50 @@ interface Task {
 }
 
 export function Home() {
-  // const [tasks, setTasks] = useState<Task[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const { theme } = useTheme();
+
+  const styles = StyleSheet.create({
+    container: {
+      backgroundColor: theme.palette.background,
+      flexGrow: 1,
+    }
+  })
 
   function handleAddTask(newTaskTitle: string) {
-    //TODO - add new task if it's not empty
+    if (newTaskTitle !== '') {
+      const task: Task = {
+        id: new Date().getTime(),
+        title: newTaskTitle,
+        done: false,
+      };
+
+      setTasks(oldState => [...oldState, task]);
+    }
   }
 
   function handleMarkTaskAsDone(id: number) {
-    //TODO - mark task as done if exists
+    setTasks(oldState => oldState.map(item => {
+      if (item.id === id) item.done = !item.done;
+      return item;
+    }));
   }
 
   function handleRemoveTask(id: number) {
-    //TODO - remove task from state
+    setTasks(oldState => oldState.filter(item => item.id !== id));
   }
 
   return (
-    <>
+    <View style={styles.container}>
       <Header />
 
       <TodoInput addTask={handleAddTask} />
 
-      <MyTasksList 
-        tasks={tasks} 
-        onPress={handleMarkTaskAsDone} 
-        onLongPress={handleRemoveTask} 
+      <MyTasksList
+        tasks={tasks}
+        onPress={handleMarkTaskAsDone}
+        onLongPress={handleRemoveTask}
       />
-    </>
+    </View>
   )
 }
